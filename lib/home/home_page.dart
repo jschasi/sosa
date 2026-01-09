@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'alert_button.dart';
 import '../core/colors.dart';
-import '../link/link_page.dart'; // 👈 IMPORTANTE
+import '../link/link_page.dart';
 import '../auth/login_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../auth_service.dart';
 
 class HomePage extends StatefulWidget {
   final bool isGuest;
@@ -28,6 +30,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Future<String> _getUserName() async {
+    try {
+      final user = AuthService().currentUser;
+      if (user == null) return 'Invitado';
+
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      return doc.exists ? (doc['name'] ?? 'Usuario') : 'Usuario';
+    } catch (e) {
+      return 'Usuario';
+    }
   }
 
   @override
@@ -66,13 +84,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       children: [
                         const Icon(Icons.security, size: 48, color: Colors.white),
                         const SizedBox(height: 8),
-                        Text(
-                          widget.isGuest ? '¡Bienvenido Invitado!' : '¡Hola Usuario!',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        FutureBuilder<String>(
+                          future: _getUserName(),
+                          builder: (context, snapshot) {
+                            String greeting = widget.isGuest 
+                              ? '¡Bienvenido Invitado!' 
+                              : '¡Hola ${snapshot.data ?? 'Usuario'}!';
+                            
+                            return Text(
+                              greeting,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(height: 4),
                         Text(

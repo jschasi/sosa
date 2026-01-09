@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import '../home/home_page.dart';
 import 'register_page.dart';
+import '../auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
+
+
+
+  
   State<LoginPage> createState() => _LoginPageState();
 }
 
@@ -42,11 +47,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 400),
-                    curve: Curves.easeOut,
-                    child: const Icon(Icons.security, size: 90, color: Colors.white),
-                  ),
+                  const Icon(Icons.security, size: 90, color: Colors.white),
                   const SizedBox(height: 20),
                   const Text(
                     'ALERTIKA',
@@ -107,12 +108,19 @@ class _LoginPageState extends State<LoginPage> {
                                   : () async {
                                       if (!_formKey.currentState!.validate()) return;
                                       setState(() => _loading = true);
-                                      await Future.delayed(const Duration(milliseconds: 600));
-                                      if (!mounted) return;
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (_) => const HomePage(isGuest: false)),
-                                      );
+                                      try {
+                                        await AuthService().signIn(
+                                          email: _emailController.text.trim(),
+                                          password: _passwordController.text.trim(),
+                                        );
+                                        if (!mounted) return;
+                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomePage(isGuest: false)));
+                                      } catch (e) {
+                                        print("ERROR LOGIN: $e");
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: Colors.red));
+                                      } finally {
+                                        if (mounted) setState(() => _loading = false);
+                                      }
                                     },
                               style: ElevatedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 50),
