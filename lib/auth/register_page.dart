@@ -14,6 +14,14 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _cedulaController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  
+  String _gender = 'Masculino';
+  final List<String> _genders = ['Masculino', 'Femenino', 'Otro'];
+
   bool _obscure = true;
   bool _loading = false;
 
@@ -22,6 +30,10 @@ class _RegisterPageState extends State<RegisterPage> {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _phoneController.dispose();
+    _cedulaController.dispose();
+    _ageController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -106,6 +118,69 @@ class _RegisterPageState extends State<RegisterPage> {
                               return null;
                             },
                           ),
+                          const SizedBox(height: 12),
+                          
+                          // Campo Cédula
+                          TextFormField(
+                            controller: _cedulaController,
+                            enabled: !_loading,
+                            keyboardType: TextInputType.number,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _input('Cédula / DNI'),
+                            validator: (v) => v == null || v.trim().isEmpty ? 'Ingrese su cédula' : null,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Campo Teléfono
+                          TextFormField(
+                            controller: _phoneController,
+                            enabled: !_loading,
+                            keyboardType: TextInputType.phone,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _input('Teléfono'),
+                            validator: (v) => v == null || v.trim().isEmpty ? 'Ingrese su teléfono' : null,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Fila para Edad y Género
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _ageController,
+                                  enabled: !_loading,
+                                  keyboardType: TextInputType.number,
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: _input('Edad'),
+                                  validator: (v) => v == null || v.trim().isEmpty ? 'Requerido' : null,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: _gender,
+                                  dropdownColor: const Color(0xFF2C3E50),
+                                  style: const TextStyle(color: Colors.white),
+                                  decoration: _input('Género'),
+                                  items: _genders.map((g) => DropdownMenuItem(
+                                    value: g,
+                                    child: Text(g),
+                                  )).toList(),
+                                  onChanged: _loading ? null : (v) => setState(() => _gender = v!),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Campo Dirección
+                          TextFormField(
+                            controller: _addressController,
+                            enabled: !_loading,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: _input('Dirección'),
+                            validator: (v) => v == null || v.trim().isEmpty ? 'Ingrese su dirección' : null,
+                          ),
                           const SizedBox(height: 16),
 
                           SizedBox(
@@ -123,11 +198,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                           email: _emailController.text.trim(),
                                           password: _passwordController.text.trim(),
                                           name: _nameController.text.trim(),
-                                          phone: '',
-                                          cedula: '',
-                                          age: '',
-                                          gender: 'O',
-                                          address: '',
+                                          phone: _phoneController.text.trim(),
+                                          cedula: _cedulaController.text.trim(),
+                                          age: _ageController.text.trim(),
+                                          gender: _gender,
+                                          address: _addressController.text.trim(),
                                         );
 
                                         if (!mounted) return;

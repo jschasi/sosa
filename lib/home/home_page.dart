@@ -5,6 +5,7 @@ import '../link/link_page.dart';
 import '../auth/login_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../auth_service.dart';
+import 'profile_page.dart';
 
 class HomePage extends StatefulWidget {
   final bool isGuest;
@@ -270,7 +271,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             context,
             icon: Icons.person,
             title: 'Perfil',
-            onTap: () {},
+            onTap: () {
+              Navigator.pop(context); // Cerrar el drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilePage()),
+              );
+            },
           ),
 
           const Divider(color: Colors.white24, height: 24),
